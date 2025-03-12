@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analog Clock - Karachi Time</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            font-size: 35px;
+            color: #333;
+        }
+        canvas {
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            border: 5px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Karachi Analog Clock</h1>
+    <canvas id="clock" width="400" height="400"></canvas>
+
+    <script>
+        function drawClock() {
+            var canvas = document.getElementById("clock");
+            var ctx = canvas.getContext("2d");
+            var now = new Date();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            var radius = canvas.width / 2 - 20;
+
+            // Draw Circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            // Draw Numbers (1-12)
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            for (var i = 1; i <= 12; i++) {
+                var angle = (i - 3) * (Math.PI / 6);
+                var x = centerX + Math.cos(angle) * (radius - 30);
+                var y = centerY + Math.sin(angle) * (radius - 30);
+                ctx.fillText(i, x, y);
+            }
+
+            // Convert to Karachi Time
+            var karachiTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Karachi"}));
+
+            function drawHand(length, width, angle, color) {
+                ctx.beginPath();
+                ctx.lineWidth = width;
+                ctx.lineCap = "round";
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + length * Math.cos(angle), centerY + length * Math.sin(angle));
+                ctx.strokeStyle = color;
+                ctx.stroke();
+            }
+
+            var sec = karachiTime.getSeconds() * Math.PI / 30;
+            var min = (karachiTime.getMinutes() + karachiTime.getSeconds() / 60) * Math.PI / 30;
+            var hour = (karachiTime.getHours() % 12 + karachiTime.getMinutes() / 60) * Math.PI / 6;
+
+            drawHand(radius * 0.5, 8, hour - Math.PI / 2, "black");
+            drawHand(radius * 0.7, 6, min - Math.PI / 2, "black");
+            drawHand(radius * 0.9, 3, sec - Math.PI / 2, "red");
+
+            setTimeout(drawClock, 1000);
+        }
+
+        drawClock();
+    </script>
+</body>
+</html>
